@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "424730266680",
+    "project_id": "social-b14d5",
+    "storage_bucket": "social-b14d5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:424730266680:android:6eb223b8fe05d7f8f1aacd",
+        "android_client_info": {
+          "package_name": "org.alexwayne.social"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "424730266680-3k0eic1jpn58i9n83vn7r4bkunu3s0di.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlpOV8Ye18XBwdoAimwlEdVr7uqCY-mCE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "424730266680-3k0eic1jpn58i9n83vn7r4bkunu3s0di.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
