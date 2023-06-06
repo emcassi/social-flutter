@@ -29,6 +29,8 @@ class _EditProfileState extends State<EditProfile> {
   late Image avi;
   late File aviFile;
 
+  bool changedAvi = false;
+
   final defaultImage =
       "https://th.bing.com/th/id/OIP.UujSBl4u7QBJFs8bfiYFfwHaHa?pid=ImgDet&rs=1";
 
@@ -49,6 +51,7 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
@@ -58,6 +61,7 @@ class _EditProfileState extends State<EditProfile> {
       setState(() {
         avi = Image.file(File(pickedImage.path));
         aviFile = File(pickedImage.path);
+        changedAvi = true;
       });
       // Process or display the image as desired
     } else {
@@ -164,8 +168,7 @@ class _EditProfileState extends State<EditProfile> {
                             const SnackBar(content: Text('Saving Data')),
                           );
 
-                          if (aviFile == File(defaultImage) ||
-                              aviFile == File(widget.user.aviUrl ?? "")) {
+                          if (!changedAvi) {
                             FirebaseFirestore.instance
                                 .collection("users")
                                 .doc(widget.user.uid)
@@ -186,6 +189,10 @@ class _EditProfileState extends State<EditProfile> {
                                 .instance
                                 .ref()
                                 .child('images/${DateTime.now().toString()}');
+
+                            FirebaseStorage.instance
+                                .refFromURL(widget.user.aviUrl ?? "")
+                                .delete();
 
                             UploadTask uploadTask =
                                 storageReference.putFile(aviFile);
