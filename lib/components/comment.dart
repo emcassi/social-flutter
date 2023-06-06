@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:social/controllers/date.dart';
 import 'package:social/types/comment.dart';
 
 class CommentView extends StatelessWidget {
@@ -8,9 +10,10 @@ class CommentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final avi = Image.asset("assets/images/no_avatar.png").image;
+    final avi = comment.author.aviUrl != null ? Image.network(comment.author.aviUrl!).image : Image.asset("assets/images/no_avatar.png").image;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
@@ -26,6 +29,7 @@ class CommentView extends StatelessWidget {
                     Text("@alexa", style: const TextStyle(fontSize: 14)),
                   ],
                 )),
+            Text(" • ${DateController.formatTime(comment.posted)}", style: const TextStyle(fontSize: 14)),
             const Spacer(),
             PopupMenuButton(
               onSelected: (String value) {

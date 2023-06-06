@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social/components/comment.dart';
 import 'package:social/components/post_view.dart';
+import 'package:social/controllers/comment_controller.dart';
 import 'package:social/types/comment.dart';
 import 'package:social/types/post.dart';
 
@@ -13,11 +15,21 @@ class PostPage extends StatefulWidget {
 }
 
 class _PostPageState extends State<PostPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _commentController = TextEditingController();
+  late Future<List<Comment>> comments;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    comments = CommentController.getComments(widget.post);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("@${widget.post.user.username})"),
+        title: Text("@${widget.post.user.username}'s post"),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -29,35 +41,93 @@ class _PostPageState extends State<PostPage> {
                 children: [
                   PostView(post: widget.post),
                   Form(
+                    key: _formKey,
                     child: Column(
                       children: [
                         TextFormField(
+                          controller: _commentController,
                           decoration: const InputDecoration(
                             hintText: "Add a comment...",
                             border: InputBorder.none,
                           ),
-                          maxLines: 3,
+                          minLines: 2,
+                          maxLines: 5,
+                          onChanged: (val) {
+                            setState(() {
+                              _formKey.currentState!.validate();
+                            });
+                          },
+                          validator: (val) {
+                            if (val == null || val.isEmpty) {
+                              return "Please enter a comment";
+                            } else if (val.length > 200) {
+                              return "Comment must be less than 200 characters";
+                            } else {
+                              return null;
+                            }
+                          },
                         ),
                         Row(
                           children: [
-                            const Spacer(),
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text("Post"),
+                            Spacer(),
+                            Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Text(
+                                  "${_commentController.text.length}/200",
+                                  style: TextStyle(
+                                      color:
+                                          _commentController.text.length > 200
+                                              ? Colors.red
+                                              : Colors.grey)),
                             ),
                           ],
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              CommentController.addComment(
+                                      widget.post, _commentController.text)
+                                  .then((val) => {
+                                        setState(() {
+                                          _commentController.clear();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                                  content:
+                                                      Text("Comment posted")));
+                                        })
+                                      })
+                                  .catchError((error) => print(error));
+                            }
+                          },
+                          child: const Text("Post"),
                         ),
                       ],
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: const Text("Comments", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    child: const Text("Comments",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
                   ),
-                  ListView.builder(itemBuilder: (context, index) {
-                    Comment comment = Comment(id: "1234", text: "Tasdpfoijas dfpaoisdaposd fasp odijapos djpoiaj dfasdfasdf asd fasd fasd fasd fasd fasd fasdf asd f", author: "12345", posted: DateTime.now());
-                    return CommentView(comment: comment);
-                  }, itemCount: 10, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+                  FutureBuilder(
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            return CommentView(comment: snapshot.data![index]);
+                          },
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text("Error: ${snapshot.error}");
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    },
+                    future: comments,
                   ),
                 ],
               ),
