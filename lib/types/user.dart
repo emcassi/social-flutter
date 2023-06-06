@@ -6,6 +6,7 @@ class SocialUser {
   String name;
   String email;
   String username;
+  bool rightHanded;
   DateTime joined;
   String? aviUrl;
   String? bio;
@@ -16,6 +17,7 @@ class SocialUser {
     required this.name,
     required this.email,
     required this.username,
+    required this.rightHanded,
     required this.joined,
     this.aviUrl,
     this.bio,
@@ -33,6 +35,7 @@ class SocialUser {
           name: value.data()?['name'],
           email: value.data()?['email'],
           username: value.data()?['username'],
+          rightHanded: value.data()?['rightHanded'] ?? true,
           joined: value.data()?['joined'].toDate(),
           bio: value.data()?['bio'],
           website: value.data()?['website'],

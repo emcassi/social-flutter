@@ -49,8 +49,7 @@ class _RegisterState extends State<Register> {
     if (value == null || value.isEmpty) {
       return 'Please enter an email address.';
     }
-    final nameRegex = RegExp(
-        r'^[a-zA-Z0-9_.-]{2,}$');
+    final nameRegex = RegExp(r'^[a-zA-Z0-9_.-]{2,}$');
     if (!nameRegex.hasMatch(value)) {
       return 'Usernames can only include letters, numbers and the following characters: _ - and . ';
     }
@@ -106,13 +105,13 @@ class _RegisterState extends State<Register> {
       final username = _usernameController.text;
       final password = _passwordController.text;
 
-      AuthController.register(name, email, username, password).then((value) => {
-          Navigator.pop(context)
-      }).catchError((error) => {
-        print(error)
-      });
+      AuthController.register(name, email, username, password, domHand == "Right")
+          .then((value) => {Navigator.pop(context)})
+          .catchError((error) => {print(error)});
     }
   }
+
+  String domHand = 'Right';
 
   bool termsChecked = false;
 
@@ -191,6 +190,33 @@ class _RegisterState extends State<Register> {
                     ),
                   ),
                 )),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+              Text("Dominand Hand"),
+              DropdownButton(
+                // Initial Value
+                value: domHand,
+
+                // Down Arrow Icon
+                icon: const Icon(Icons.keyboard_arrow_down),
+
+                // Array list of items
+                items: ["Right", "Left"].map((String items) {
+                  return DropdownMenuItem(
+                    value: items,
+                    child: Text(items),
+                  );
+                }).toList(),
+                // After selecting the desired option,it will
+                // change button value to selected value
+                onChanged: (String? newValue) {
+                  setState(() {
+                    domHand = newValue!;
+                  });
+                },
+              )
+            ]),
             GestureDetector(
                 onTap: () => {
                       setState(() {

@@ -19,7 +19,7 @@ class AuthController {
     }
   }
 
-  static Future<bool> register(String name, String email, String username, String password) async {
+  static Future<bool> register(String name, String email, String username, String password, bool rightHanded) async {
     try {
       FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
@@ -29,6 +29,7 @@ class AuthController {
           "name": name,
           "email": email,
           "username": username,
+          "rightHanded": rightHanded,
         }).catchError((error) => {
           print(error)
         })
@@ -63,13 +64,14 @@ class AuthController {
         final data = doc.data() as Map<String, dynamic>; // Cast to Map<String, dynamic>
         final text = data['text'];
         final timestamp = data['timestamp'].toDate();
+        final imageUrl = data['image'];
 
         SocialUser? user = await SocialUser.fromFirebase(uid);
         if (user == null) {
           throw Exception("User not found");
         }
 
-        list.add(Post(text: text, timestamp: timestamp, user: user));
+        list.add(Post(id: doc.id, text: text, timestamp: timestamp, user: user, imageUrl: imageUrl));
       }
     }
     return list;

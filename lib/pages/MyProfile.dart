@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:social/components/post_view.dart';
 import 'package:social/controllers/AuthController.dart';
 import 'package:social/controllers/route_observer.dart';
+import 'package:social/pages/post.dart';
 import 'package:social/pages/settings.dart';
 import 'package:social/providers/user_provider.dart';
 import 'package:social/types/post.dart';
@@ -202,9 +203,14 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: psts.length,
                       itemBuilder: (context, index) {
-                        return PostView(
+                        return GestureDetector(
+                          onTap: () {
+                            print("SDFPOIJSDF");
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => PostPage(post: psts[index],)));
+                          },
+                            child: PostView(
                           post: psts[index],
-                        );
+                        ));
                       },
                     );
                   } else if (snapshot.hasError) {
