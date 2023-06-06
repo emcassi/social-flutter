@@ -27,7 +27,6 @@ class PostController {
       print(error);
       likes = false;
     }
-    print("DOES LIKE? " + likes.toString());
     return likes;
   }
 
@@ -49,6 +48,25 @@ class PostController {
       likes = 0;
     }
     return likes;
+  }
+
+  static Future<int> getNumComments(Post post) async {
+    int comments = 0;
+
+    try {
+      final value = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(post.user.uid)
+          .collection("posts")
+          .doc(post.id)
+          .collection("comments")
+          .get();
+
+      comments = value.docs.length;
+    } catch (error) {
+      comments = 0;
+    }
+    return comments;
   }
 
   static Future<void> likePost(Post post, bool like) async {

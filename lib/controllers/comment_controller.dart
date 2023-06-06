@@ -44,4 +44,51 @@ class CommentController {
 
     return commentList;
   }
+
+  static Future<void> deleteComment(Post post, Comment comment) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(post.user.uid)
+        .collection("posts")
+        .doc(post.id)
+        .collection("comments")
+        .doc(comment.id)
+        .delete()
+        .catchError((error) {
+      print("ERROR: " + error);
+    });
+  }
+
+  static Future<void> editComment(Post post, Comment comment, String text) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(post.user.uid)
+        .collection("posts")
+        .doc(post.id)
+        .collection("comments")
+        .doc(comment.id)
+        .update({
+      "comment": text,
+    }).catchError((error) {
+      print("ERROR: " + error);
+    });
+  }
+
+  static Future<void> likeComment(Post post, Comment comment, SocialUser user) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(post.user.uid)
+        .collection("posts")
+        .doc(post.id)
+        .collection("comments")
+        .doc(comment.id)
+        .collection("likes")
+        .doc(user.uid)
+        .set({
+      "user": user.uid,
+      "timestamp": DateTime.now(),
+    }).catchError((error) {
+      print("ERROR: " + error);
+    });
+  }
 }

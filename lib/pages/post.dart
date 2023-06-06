@@ -39,7 +39,7 @@ class _PostPageState extends State<PostPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  PostView(post: widget.post),
+                  PostView(post: widget.post, parent: this.widget),
                   Form(
                     key: _formKey,
                     child: Column(

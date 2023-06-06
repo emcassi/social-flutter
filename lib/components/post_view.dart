@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:social/controllers/post_controller.dart';
+import 'package:social/pages/post.dart';
 import 'package:social/types/post.dart';
 import 'package:social/types/user.dart';
 
 class PostView extends StatefulWidget {
   final Post post;
-  PostView({Key? key, required this.post}) : super(key: key);
+  final PostPage? parent;
+  PostView({Key? key, required this.post, this.parent}) : super(key: key);
 
   @override
   State<PostView> createState() => _PostViewState();
@@ -14,6 +16,7 @@ class PostView extends StatefulWidget {
 class _PostViewState extends State<PostView> {
   bool liked = false;
   int numLikes = 0;
+  int numComments = 0;
 
   @override
   void initState() {
@@ -31,6 +34,11 @@ class _PostViewState extends State<PostView> {
       });
     }).catchError((error) => print(error));
 
+    PostController.getNumComments(widget.post).then((value) {
+      setState(() {
+        numComments = value;
+      });
+    }).catchError((error) => print(error));
   }
 
   @override
@@ -115,7 +123,7 @@ class _PostViewState extends State<PostView> {
                 const SizedBox(width: 5,),
                 Text("Likes"),
                 const SizedBox(width: 10,),
-                Text("0", style: const TextStyle(fontWeight: FontWeight.bold),),
+                Text("$numComments", style: const TextStyle(fontWeight: FontWeight.bold),),
                 const SizedBox(width: 5,),
                 Text("Comments"),
               ],
@@ -135,8 +143,8 @@ class _PostViewState extends State<PostView> {
                           else numLikes--;
                         });
                       }).catchError((error) => print(error));
-                    }, icon: liked ? const Icon(Icons.favorite) : const Icon(Icons.favorite_border)),
-                    IconButton(onPressed: () {}, icon: const Icon(Icons.comment)),
+                    }, icon: liked ? const Icon(Icons.favorite, color: Colors.pink,) : const Icon(Icons.favorite_border)),
+                    widget.parent != null ? Container() : IconButton(onPressed: () {}, icon: const Icon(Icons.comment)),
                 IconButton(onPressed: () {}, icon: const Icon(Icons.share)),
               ],
             ),
