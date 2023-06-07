@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:social/components/post_view.dart';
 import 'package:social/controllers/AuthController.dart';
 import 'package:social/pages/NoAuth.dart';
+import 'package:social/types/post.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -13,51 +15,35 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-  int _counter = 0;
   final auth = FirebaseAuth.instance;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  List<Post> _posts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    AuthController.getFeed().then((value) =>
+      setState(() {
+        _posts = value;
+      })
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: CupertinoTheme.of(context).textTheme.textStyle,
-            ),
-            auth.currentUser != null ?
-            CupertinoButton.filled(
-              onPressed: () async {
-                await AuthController.logout();
-                setState(() {
-
-                });
-              },
-              child: Text('Sign Out'),
-            )  :
-            CupertinoButton.filled(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const NoAuth()),
-                );
-              },
-              child: Text('Get Connected'),
-            ),
-          ],
-        ),
+    return Scaffold(
+      appBar: CupertinoNavigationBar(
+        middle: const Text('Twinstagram', style: TextStyle(fontFamily: "cursive", fontSize: 28),),
       ),
-    );
+      body: ListView.builder(
+        itemCount: _posts.length,
+        itemBuilder: (context, index) {
+          if(_posts.length == 0) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return PostView(post: _posts[index]);
+          }
+      },
+    ));
   }
 }
