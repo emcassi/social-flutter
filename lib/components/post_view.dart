@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social/controllers/post_controller.dart';
+import 'package:social/pages/other_profile.dart';
 import 'package:social/pages/post.dart';
 import 'package:social/types/post.dart';
 import 'package:social/types/user.dart';
@@ -52,8 +53,13 @@ class _PostViewState extends State<PostView> {
         children: [
           Row(
                 children: [
-                  CircleAvatar(
-                    backgroundImage: avi,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfile(user: widget.post.user)));
+                    },
+                    child: CircleAvatar(
+                      backgroundImage: avi,
+                    ),
                   ),
                   Container(
                       padding: const EdgeInsets.only(left: 10),

@@ -94,6 +94,7 @@ class _PostPageState extends State<PostPage> {
                                               .showSnackBar(const SnackBar(
                                                   content:
                                                       Text("Comment posted")));
+                                          comments = CommentController.getComments(widget.post);
                                         })
                                       })
                                   .catchError((error) => print(error));

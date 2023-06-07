@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:social/pages/AddPost.dart';
 import 'package:social/pages/Browse.dart';
 import 'package:social/pages/Home.dart';
-import 'package:social/pages/MyProfile.dart';
+import 'package:social/pages/my_profile.dart';
 import 'package:social/pages/NoAuth.dart';
 import 'package:social/pages/Notifications.dart';
 import 'package:social/providers/user_provider.dart';
@@ -31,7 +31,7 @@ class _AppViewState extends State<AppView> {
       case 0:
         return const Home();
       case 1:
-        return const Browse();
+        return Browse();
       case 2:
         return Container();
       case 3:

@@ -1,11 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:social/components/post_view.dart';
 import 'package:social/controllers/AuthController.dart';
-import 'package:social/controllers/route_observer.dart';
+import 'package:social/pages/edit_profile.dart';
 import 'package:social/pages/post.dart';
 import 'package:social/pages/settings.dart';
 import 'package:social/providers/user_provider.dart';
@@ -40,7 +38,7 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
             });
           }
         },
-        key: Key("my-profile"),
+        key: const Key("my-profile"),
         child: ListView(
           children: [
             Padding(
@@ -53,14 +51,13 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                         child: Column(children: [
                           CircleAvatar(
                             radius: 50,
-                            backgroundImage: NetworkImage(user?.aviUrl ??
-                                "https://th.bing.com/th/id/OIP.UujSBl4u7QBJFs8bfiYFfwHaHa?pid=ImgDet&rs=1"),
+                            backgroundImage: user.aviUrl == null ? Image.asset("assets/images/no-avatar.png").image : NetworkImage(user.aviUrl!),
                           ),
                           const SizedBox(
                             height: 20,
                           ),
                           Text(
-                            user?.name ?? "",
+                            user.name,
                             style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
@@ -68,7 +65,7 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                             height: 5,
                           ),
                           Text(
-                            "@${user?.username}",
+                            "@${user.username}",
                             style: const TextStyle(fontSize: 16),
                           ),
                           const SizedBox(
@@ -126,19 +123,22 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                               ),
                             ],
                           ),
-                          const SizedBox(
-                            height: 20,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: ElevatedButton(onPressed: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(user: user)));
+                            }, style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[600]), child: const Text("Edit Profile")),
                           ),
-                          Text(user?.bio ?? bio),
+                          Text(user.bio ?? bio),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              user?.website != null
+                              user.website != null
                                   ? Row(
                                 children: [
-                                  Icon(Icons.link),
+                                  const Icon(Icons.link),
                                   TextButton(
-                                    child: Text(user!.website!),
+                                    child: Text(user.website!),
                                     onPressed: () async {
                                       // Open website
                                       try {
@@ -153,7 +153,7 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                                       } catch (e) {
                                         // Show error in an alert
                                         final alert = AlertDialog(
-                                          title: Text("Error"),
+                                          title: const Text("Error"),
                                           content: Text(e.toString()),
                                         );
                                         showDialog(
@@ -167,14 +167,14 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                                   : Container(),
                               Row(
                                 children: [
-                                  Icon(Icons.cake),
+                                  const Icon(Icons.cake),
                                   Text(DateFormat('MMMM d, yyyy')
-                                      .format(user!.joined)),
+                                      .format(user.joined)),
                                 ],
                               ),
                             ],
                           ),
-                          Divider(),
+                          const Divider(),
                         ])),
                     Positioned(
                       top: 0,
@@ -184,10 +184,10 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => Settings(user: user!)),
+                                builder: (context) => Settings(user: user)),
                           );
                         },
-                        icon: Icon(Icons.settings),
+                        icon: const Icon(Icons.settings),
                       ),
                     )
                   ],
@@ -200,12 +200,11 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
 
                     return ListView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: psts.length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            print("SDFPOIJSDF");
                             Navigator.push(context, MaterialPageRoute(builder: (context) => PostPage(post: psts[index],)));
                           },
                             child: PostView(
@@ -216,7 +215,7 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                   } else if (snapshot.hasError) {
                     return Center(child: Text(snapshot.error.toString()));
                   } else {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                 }
             ),
