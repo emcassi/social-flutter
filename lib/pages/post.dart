@@ -32,110 +32,115 @@ class _PostPageState extends State<PostPage> {
       appBar: AppBar(
         title: Text("@${widget.post.user.username}'s post"),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  PostView(post: widget.post, parent: widget),
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: _commentController,
-                          decoration: const InputDecoration(
-                            hintText: "Add a comment...",
-                            border: InputBorder.none,
-                          ),
-                          minLines: 2,
-                          maxLines: 5,
-                          focusNode: widget.focusNode,
-                          onChanged: (val) {
-                            setState(() {
-                              _formKey.currentState!.validate();
-                            });
-                          },
-                          validator: (val) {
-                            if (val == null || val.isEmpty) {
-                              return "Please enter a comment";
-                            } else if (val.length > 200) {
-                              return "Comment must be less than 200 characters";
-                            } else {
-                              return null;
-                            }
-                          },
-                        ),
-                        Row(
-                          children: [
-                            Spacer(),
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Text(
-                                  "${_commentController.text.length}/200",
-                                  style: TextStyle(
-                                      color:
-                                          _commentController.text.length > 200
-                                              ? Colors.red
-                                              : Colors.grey)),
+      body: GestureDetector(
+        onTap: () {
+          widget.focusNode.unfocus();
+        },
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PostView(post: widget.post, parent: widget),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _commentController,
+                            decoration: const InputDecoration(
+                              hintText: "Add a comment...",
+                              border: InputBorder.none,
                             ),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              CommentController.addComment(
-                                      widget.post, _commentController.text)
-                                  .then((val) => {
-                                        setState(() {
-                                          _commentController.clear();
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                                  content:
-                                                      Text("Comment posted")));
-                                          comments = CommentController.getComments(widget.post);
+                            minLines: 2,
+                            maxLines: 5,
+                            focusNode: widget.focusNode,
+                            onChanged: (val) {
+                              setState(() {
+                                _formKey.currentState!.validate();
+                              });
+                            },
+                            validator: (val) {
+                              if (val == null || val.isEmpty) {
+                                return "Please enter a comment";
+                              } else if (val.length > 200) {
+                                return "Comment must be less than 200 characters";
+                              } else {
+                                return null;
+                              }
+                            },
+                          ),
+                          Row(
+                            children: [
+                              Spacer(),
+                              Padding(
+                                padding: EdgeInsets.only(right: 8.0),
+                                child: Text(
+                                    "${_commentController.text.length}/200",
+                                    style: TextStyle(
+                                        color:
+                                            _commentController.text.length > 200
+                                                ? Colors.red
+                                                : Colors.grey)),
+                              ),
+                            ],
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                CommentController.addComment(
+                                        widget.post, _commentController.text)
+                                    .then((val) => {
+                                          setState(() {
+                                            _commentController.clear();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                                    content:
+                                                        Text("Comment posted")));
+                                            comments = CommentController.getComments(widget.post);
+                                          })
                                         })
-                                      })
-                                  .catchError((error) => print(error));
-                            }
-                          },
-                          child: const Text("Post"),
-                        ),
-                      ],
+                                    .catchError((error) => print(error));
+                              }
+                            },
+                            child: const Text("Post"),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: const Text("Comments",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                  ),
-                  FutureBuilder(
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            return CommentView(comment: snapshot.data![index]);
-                          },
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text("Error: ${snapshot.error}");
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    },
-                    future: comments,
-                  ),
-                ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: const Text("Comments",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
+                    FutureBuilder(
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return CommentView(comment: snapshot.data![index]);
+                            },
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text("Error: ${snapshot.error}");
+                        } else {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                      },
+                      future: comments,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
