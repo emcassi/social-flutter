@@ -7,6 +7,7 @@ import 'package:social/components/post_view.dart';
 import 'package:social/controllers/AuthController.dart';
 import 'package:social/controllers/formatter.dart';
 import 'package:social/pages/post.dart';
+import 'package:social/pages/see_followers.dart';
 import 'package:social/pages/settings.dart';
 import 'package:social/providers/user_provider.dart';
 import 'package:social/types/post.dart';
@@ -128,35 +129,45 @@ class _OtherProfileState extends State<OtherProfile> with RouteAware {
                                     ),
                                   ),
                                   Expanded(
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          Formatter.number(numFollowers),
-                                          style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const Text(
-                                          "Followers",
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      ],
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => SeeFollowers(user: widget.user, type: "followers")));
+                                      },
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            Formatter.number(numFollowers),
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const Text(
+                                            "Followers",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   Expanded(
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          Formatter.number(numFollowing),
-                                          style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const Text(
-                                          "Following",
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      ],
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => SeeFollowers(user: widget.user, type: "following")));
+                                      },
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            Formatter.number(numFollowing),
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const Text(
+                                            "Following",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -284,6 +295,10 @@ class _OtherProfileState extends State<OtherProfile> with RouteAware {
                     builder: (c, snapshot) {
                       if (snapshot.hasData) {
                         final psts = snapshot.data as List<Post>;
+
+                        if(psts.isEmpty) {
+                          return Center(child: Text("No posts yet"));
+                        }
 
                         return ListView.builder(
                           shrinkWrap: true,

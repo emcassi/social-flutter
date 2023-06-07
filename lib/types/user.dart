@@ -24,11 +24,11 @@ class SocialUser {
     this.website,
   });
 
-  static Future<SocialUser?> fromFirebase(String uid) async {
+  static Future<SocialUser?>? fromFirebase(String uid) async {
     SocialUser? suser;
     await FirebaseFirestore.instance.collection("users").doc(uid).get().then((value) {
       if (!value.exists) {
-        suser = null;
+        return null;
       } else {
         suser = SocialUser(
           uid: uid,
@@ -44,7 +44,7 @@ class SocialUser {
       }
     }).catchError((error) {
       print("ERROR: $error");
-      suser = null;
+      throw Exception("Error getting user");
     });
     return suser;
   }

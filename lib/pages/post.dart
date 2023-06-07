@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social/components/comment.dart';
@@ -5,6 +6,7 @@ import 'package:social/components/post_view.dart';
 import 'package:social/controllers/comment_controller.dart';
 import 'package:social/types/comment.dart';
 import 'package:social/types/post.dart';
+import 'package:social/types/user.dart';
 
 class PostPage extends StatefulWidget {
   final Post post;
@@ -19,6 +21,11 @@ class _PostPageState extends State<PostPage> {
   final _formKey = GlobalKey<FormState>();
   final _commentController = TextEditingController();
   late Future<List<Comment>> comments;
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getCommentsStream() {
+    return FirebaseFirestore.instance.collection('users').doc(widget.post.user.uid).collection("posts").doc(widget.post.id).collection("comments").snapshots();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -117,24 +124,50 @@ class _PostPageState extends State<PostPage> {
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold)),
                     ),
-                    FutureBuilder(
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              return CommentView(comment: snapshot.data![index]);
-                            },
-                          );
-                        } else if (snapshot.hasError) {
-                          return Text("Error: ${snapshot.error}");
-                        } else {
-                          return const Center(child: CircularProgressIndicator());
+                    StreamBuilder<QuerySnapshot>(
+                      stream: getCommentsStream(),
+                      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
                         }
+
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Text('Loading...');
+                        }
+
+                        // Process the snapshot data here
+                        final List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
+                        return ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: documents.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final data = documents[index].data() as Map<String, dynamic>;
+
+                            return FutureBuilder<SocialUser?>(
+                              future: SocialUser.fromFirebase(data["user"]),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return CommentView(comment: Comment(
+                                    id: documents[index].id,
+                                    author: snapshot.data!,
+                                    text: data["comment"],
+                                    posted: data["timestamp"].toDate(),
+                                    post: widget.post,
+                                  ));
+                                } else if (snapshot.hasError) {
+                                  return Text("Error: ${snapshot.error}");
+                                } else {
+                                  return const Center(child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: CircularProgressIndicator(),
+                                  ));
+                                }
+                              },
+                            );
+                          },
+                        );
                       },
-                      future: comments,
                     ),
                   ],
                 ),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:social/types/comment.dart';
 import 'package:social/types/post.dart';
 import 'package:social/types/user.dart';
@@ -13,7 +14,8 @@ class CommentController {
         .collection("comments")
         .add({
       "comment": comment,
-      "user": post.user.uid,
+      "user": FirebaseAuth.instance.currentUser!.uid,
+      "post": post.id,
       "timestamp": DateTime.now(),
     }).catchError((error) {
       print("ERROR: " + error);
@@ -39,18 +41,19 @@ class CommentController {
         text: comment.data()['comment'],
         author: user!,
         posted: comment.data()['timestamp'].toDate(),
+        post: post,
       ));
     }
 
     return commentList;
   }
 
-  static Future<void> deleteComment(Post post, Comment comment) async {
+  static Future<void> deleteComment(Comment comment) async {
     await FirebaseFirestore.instance
         .collection("users")
-        .doc(post.user.uid)
+        .doc(comment.post.user.uid)
         .collection("posts")
-        .doc(post.id)
+        .doc(comment.post.id)
         .collection("comments")
         .doc(comment.id)
         .delete()
