@@ -150,7 +150,11 @@ class _PostViewState extends State<PostView> {
                         });
                       }).catchError((error) => print(error));
                     }, icon: liked ? const Icon(Icons.favorite, color: Colors.pink,) : const Icon(Icons.favorite_border)),
-                    widget.parent != null ? Container() : IconButton(onPressed: () {}, icon: const Icon(Icons.comment)),
+                    widget.parent != null ? Container() : IconButton(onPressed: () {
+                      final page = PostPage(post: widget.post);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+                      page.focusNode.requestFocus();
+                    }, icon: const Icon(Icons.comment)),
                 IconButton(onPressed: () {}, icon: const Icon(Icons.share)),
               ],
             ),

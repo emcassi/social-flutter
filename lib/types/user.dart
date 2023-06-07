@@ -25,7 +25,7 @@ class SocialUser {
   });
 
   static Future<SocialUser?> fromFirebase(String uid) async {
-    SocialUser? suser = null;
+    SocialUser? suser;
     await FirebaseFirestore.instance.collection("users").doc(uid).get().then((value) {
       if (!value.exists) {
         suser = null;
@@ -43,7 +43,7 @@ class SocialUser {
         );
       }
     }).catchError((error) {
-      print("ERROR: " + error);
+      print("ERROR: $error");
       suser = null;
     });
     return suser;

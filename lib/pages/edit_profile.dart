@@ -190,9 +190,11 @@ class _EditProfileState extends State<EditProfile> {
                                 .ref()
                                 .child('images/${DateTime.now().toString()}');
 
-                            FirebaseStorage.instance
-                                .refFromURL(widget.user.aviUrl ?? "")
-                                .delete();
+                            if (widget.user.aviUrl != null) {
+                              FirebaseStorage.instance
+                                  .refFromURL(widget.user.aviUrl!)
+                                  .delete();
+                            }
 
                             UploadTask uploadTask =
                                 storageReference.putFile(aviFile);
@@ -205,7 +207,7 @@ class _EditProfileState extends State<EditProfile> {
                                   .update({
                                 "name": nameController.text,
                                 "bio": bioController.text,
-                                "website": websiteController.text,
+                                "website": websiteController.text.isNotEmpty ? websiteController.text : null,
                                 "aviUrl": url,
                               }).then((value) async {
                                 await provider.fetchUser();

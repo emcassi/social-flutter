@@ -84,9 +84,19 @@ class PostController {
       }).catchError((error) => {
         print(error)
       });
+      await FirebaseFirestore.instance.collection("users").doc(post.user.uid).update({
+        "likes": FieldValue.increment(-1),
+      }).catchError((error) => {
+        print(error)
+      });
     } else { // Otherwise, like the post
       await FirebaseFirestore.instance.collection("users").doc(post.user.uid).collection("posts").doc(post.id).update({
         "likes": FieldValue.arrayUnion([currentUser]),
+      }).catchError((error) => {
+        print(error)
+      });
+      await FirebaseFirestore.instance.collection("users").doc(post.user.uid).update({
+        "likes": FieldValue.increment(1),
       }).catchError((error) => {
         print(error)
       });

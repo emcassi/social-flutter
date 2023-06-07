@@ -8,7 +8,8 @@ import 'package:social/types/post.dart';
 
 class PostPage extends StatefulWidget {
   final Post post;
-  const PostPage({Key? key, required this.post}) : super(key: key);
+  final focusNode = FocusNode();
+  PostPage({Key? key, required this.post}) : super(key: key);
 
   @override
   State<PostPage> createState() => _PostPageState();
@@ -39,7 +40,7 @@ class _PostPageState extends State<PostPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  PostView(post: widget.post, parent: this.widget),
+                  PostView(post: widget.post, parent: widget),
                   Form(
                     key: _formKey,
                     child: Column(
@@ -52,6 +53,7 @@ class _PostPageState extends State<PostPage> {
                           ),
                           minLines: 2,
                           maxLines: 5,
+                          focusNode: widget.focusNode,
                           onChanged: (val) {
                             setState(() {
                               _formKey.currentState!.validate();

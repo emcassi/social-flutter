@@ -20,15 +20,15 @@ class MyProfile extends StatefulWidget {
 }
 
 class _MyProfileState extends State<MyProfile> with RouteAware {
-  final String bio = """
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-  """;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (context, provider, _) {
       final SocialUser? user = provider.user;
-      Future<List<Post>> posts = AuthController.getPosts(user!.uid);
+      if(user == null) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      Future<List<Post>> posts = AuthController.getPosts(user.uid);
 
       return VisibilityDetector(
         onVisibilityChanged: (visibilityInfo) {
@@ -129,9 +129,12 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                               Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(user: user)));
                             }, style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[600]), child: const Text("Edit Profile")),
                           ),
-                          Text(user.bio ?? bio),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: Text(user.bio ?? "", textAlign: TextAlign.center, style: const TextStyle(fontSize: 14),),
+                          ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               user.website != null
                                   ? Row(
@@ -174,7 +177,6 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                               ),
                             ],
                           ),
-                          const Divider(),
                         ])),
                     Positioned(
                       top: 0,
@@ -192,11 +194,14 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                     )
                   ],
                 )),
+            const Divider(height: 20, thickness: 1,),
             FutureBuilder(
                 future: posts,
                 builder: (c, snapshot) {
                   if(snapshot.hasData) {
                     final psts = snapshot.data as List<Post>;
+
+                    if(psts.isEmpty) return const Center(child: Text("No posts yet"),);
 
                     return ListView.builder(
                       shrinkWrap: true,
