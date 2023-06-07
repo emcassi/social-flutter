@@ -41,15 +41,14 @@ class _MyAppState extends State<MyApp> {
 
     final RouteObserver<Route<dynamic>> routeObserver = RouteObserverProvider.of(context);
 
-    return MaterialApp(
-      navigatorObservers: [routeObserver],
+    return ChangeNotifierProvider<UserProvider>(create: (_) => userProvider,
+      child: MaterialApp(
+          navigatorObservers: [routeObserver],
         title: 'My App',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+        primarySwatch: Colors.blue,
         ),
-        home: ChangeNotifierProvider.value(
-          value: userProvider,
-          child: AppView(),
+        home: AppView(),
         ),
     );
   }

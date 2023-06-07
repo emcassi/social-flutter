@@ -80,6 +80,7 @@ class Settings extends StatelessWidget {
           title: const Text('Logout'),
           onTap: () async {
             await AuthController.logout();
+            Navigator.pop(context);
             Navigator.pushNamedAndRemoveUntil(context, '/noauth', (route) => false);
           },
         ),

@@ -2,9 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social/components/ClearableSecureTextField.dart';
 import 'package:social/components/ClearableTextField.dart';
 import 'package:social/controllers/AuthController.dart';
+import 'package:social/providers/user_provider.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -38,7 +40,7 @@ class _SignInState extends State<SignIn> {
     return null;
   }
 
-  void _submitForm() async {
+  void _submitForm(UserProvider provider) async {
     if (_formKey.currentState?.validate() == true) {
       print('Form submitted');
 
@@ -46,7 +48,15 @@ class _SignInState extends State<SignIn> {
       final password = _passwordController.text;
 
       AuthController.login(email, password).then((value) {
+        provider.fetchUser();
         Navigator.of(context).pop();
+      }).catchError((error) {
+        showDialog(context: context, builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text(error.toString()),
+          );
+        });
       });
     }
   }
@@ -55,7 +65,9 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Consumer<UserProvider>(builder: (context, provider, _)
+    {
+      return Center(
       child: Form(
         key: _formKey,
         child: Column(
@@ -88,7 +100,9 @@ class _SignInState extends State<SignIn> {
                   ),
                 )),
             ElevatedButton(
-              onPressed: _submitForm,
+              onPressed: () {
+                _submitForm(Provider.of<UserProvider>(context, listen: false));
+              },
               child: Text('Sign in'),
             ),
             ElevatedButton(
@@ -101,5 +115,6 @@ class _SignInState extends State<SignIn> {
         ),
       ),
     );
+    });
   }
 }

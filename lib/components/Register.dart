@@ -2,10 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social/components/ClearableSecureTextField.dart';
 import 'package:social/components/ClearableTextField.dart';
 import 'package:http/http.dart' as http;
 import 'package:social/controllers/AuthController.dart';
+import 'package:social/providers/user_provider.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -96,7 +98,7 @@ class _RegisterState extends State<Register> {
     return null;
   }
 
-  void _submitForm() {
+  void _submitForm(UserProvider provider) {
     if (_formKey.currentState?.validate() == true) {
       print('Form submitted');
 
@@ -106,7 +108,10 @@ class _RegisterState extends State<Register> {
       final password = _passwordController.text;
 
       AuthController.register(name, email, username, password, domHand == "Right")
-          .then((value) => {Navigator.pop(context)})
+          .then((value) {
+            provider.fetchUser();
+            Navigator.pop(context);
+          })
           .catchError((error) => {print(error)});
     }
   }
@@ -117,133 +122,140 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            ClearableTextFormField(
-                controller: _nameController,
-                label: "Name",
-                placeholder: "Name",
-                prefix: Icon(CupertinoIcons.person_fill),
-                validator: _validateName,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: CupertinoColors.systemGrey,
-                      width: 1,
+    return Consumer<UserProvider>(builder: (context, provider, _)
+    {
+      return SizedBox(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              ClearableTextFormField(
+                  controller: _nameController,
+                  label: "Name",
+                  placeholder: "Name",
+                  prefix: Icon(CupertinoIcons.person_fill),
+                  validator: _validateName,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: CupertinoColors.systemGrey,
+                        width: 1,
+                      ),
                     ),
-                  ),
-                )),
-            ClearableTextFormField(
-                controller: _emailController,
-                label: "Email",
-                placeholder: "Email",
-                prefix: Icon(CupertinoIcons.mail),
-                validator: _validateEmail,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: CupertinoColors.systemGrey,
-                      width: 1,
+                  )),
+              ClearableTextFormField(
+                  controller: _emailController,
+                  label: "Email",
+                  placeholder: "Email",
+                  prefix: Icon(CupertinoIcons.mail),
+                  validator: _validateEmail,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: CupertinoColors.systemGrey,
+                        width: 1,
+                      ),
                     ),
-                  ),
-                )),
-            ClearableTextFormField(
-                controller: _usernameController,
-                label: "Username",
-                placeholder: "Username",
-                prefix: Icon(CupertinoIcons.at),
-                validator: _validateUsername,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: CupertinoColors.systemGrey,
-                      width: 1,
+                  )),
+              ClearableTextFormField(
+                  controller: _usernameController,
+                  label: "Username",
+                  placeholder: "Username",
+                  prefix: Icon(CupertinoIcons.at),
+                  validator: _validateUsername,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: CupertinoColors.systemGrey,
+                        width: 1,
+                      ),
                     ),
-                  ),
-                )),
-            ClearableSecureTextField(
-                controller: _passwordController,
-                label: "Password",
-                placeholder: "Password",
-                validator: _validatePassword,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: CupertinoColors.systemGrey,
-                      width: 1,
+                  )),
+              ClearableSecureTextField(
+                  controller: _passwordController,
+                  label: "Password",
+                  placeholder: "Password",
+                  validator: _validatePassword,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: CupertinoColors.systemGrey,
+                        width: 1,
+                      ),
                     ),
-                  ),
-                )),
-            ClearableSecureTextField(
-                controller: _confirmPasswordController,
-                label: "Confirm Password",
-                placeholder: "Password",
-                validator: _validateConfirmPassword,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: CupertinoColors.systemGrey,
-                      width: 1,
+                  )),
+              ClearableSecureTextField(
+                  controller: _confirmPasswordController,
+                  label: "Confirm Password",
+                  placeholder: "Password",
+                  validator: _validateConfirmPassword,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: CupertinoColors.systemGrey,
+                        width: 1,
+                      ),
                     ),
-                  ),
-                )),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-              Text("Dominand Hand"),
-              DropdownButton(
-                // Initial Value
-                value: domHand,
+                  )),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text("Dominand Hand"),
+                    DropdownButton(
+                      // Initial Value
+                      value: domHand,
 
-                // Down Arrow Icon
-                icon: const Icon(Icons.keyboard_arrow_down),
+                      // Down Arrow Icon
+                      icon: const Icon(Icons.keyboard_arrow_down),
 
-                // Array list of items
-                items: ["Right", "Left"].map((String items) {
-                  return DropdownMenuItem(
-                    value: items,
-                    child: Text(items),
-                  );
-                }).toList(),
-                // After selecting the desired option,it will
-                // change button value to selected value
-                onChanged: (String? newValue) {
-                  setState(() {
-                    domHand = newValue!;
-                  });
+                      // Array list of items
+                      items: ["Right", "Left"].map((String items) {
+                        return DropdownMenuItem(
+                          value: items,
+                          child: Text(items),
+                        );
+                      }).toList(),
+                      // After selecting the desired option,it will
+                      // change button value to selected value
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          domHand = newValue!;
+                        });
+                      },
+                    )
+                  ]),
+              GestureDetector(
+                  onTap: () =>
+                  {
+                    setState(() {
+                      termsChecked = !termsChecked;
+                    })
+                  },
+                  child: CupertinoFormRow(
+                      child: Row(children: [
+                        Checkbox(
+                            value: termsChecked,
+                            onChanged: (e) =>
+                            {
+                              setState(() {
+                                termsChecked = !termsChecked;
+                              })
+                            }),
+                        const Text(
+                          "By creating an account, you agree to \nour Terms of Service and Privacy Policy. ",
+                          maxLines: 3,
+                        ),
+                      ]))),
+              ElevatedButton(
+                onPressed: () {
+                  _submitForm(provider);
                 },
-              )
-            ]),
-            GestureDetector(
-                onTap: () => {
-                      setState(() {
-                        termsChecked = !termsChecked;
-                      })
-                    },
-                child: CupertinoFormRow(
-                    child: Row(children: [
-                  Checkbox(
-                      value: termsChecked,
-                      onChanged: (e) => {
-                            setState(() {
-                              termsChecked = !termsChecked;
-                            })
-                          }),
-                  const Text(
-                    "By creating an account, you agree to \nour Terms of Service and Privacy Policy. ",
-                    maxLines: 3,
-                  ),
-                ]))),
-            ElevatedButton(
-              onPressed: _submitForm,
-              child: Text('Register'),
-            ),
-          ],
+                child: Text('Register'),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

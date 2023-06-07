@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:social/components/post_view.dart';
 import 'package:social/controllers/AuthController.dart';
+import 'package:social/controllers/formatter.dart';
 import 'package:social/pages/edit_profile.dart';
 import 'package:social/pages/post.dart';
 import 'package:social/pages/settings.dart';
@@ -20,6 +22,29 @@ class MyProfile extends StatefulWidget {
 }
 
 class _MyProfileState extends State<MyProfile> with RouteAware {
+
+  String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  int numFollowers = 0;
+  int numFollowing = 0;
+  int numLikes = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    AuthController.getFollowersCount(uid).then((value) => {
+        numFollowers = value
+    });
+
+    AuthController.getFollowingCount(uid).then((value) => {
+        numFollowing = value
+    });
+
+    AuthController.getLikesCount(uid).then((value) => {
+        numLikes = value
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,18 +96,18 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                           const SizedBox(
                             height: 20,
                           ),
-                          const Row(
+                          Row(
                             children: [
                               Expanded(
                                 child: Column(
                                   children: [
                                     Text(
-                                      "1.5K",
-                                      style: TextStyle(
+                                      Formatter.number(numLikes),
+                                      style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    Text(
+                                    const Text(
                                       "Likes",
                                       style: TextStyle(fontSize: 16),
                                     ),
@@ -93,12 +118,12 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                                 child: Column(
                                   children: [
                                     Text(
-                                      "2.5K",
-                                      style: TextStyle(
+                                      Formatter.number(numFollowers),
+                                      style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    Text(
+                                    const Text(
                                       "Followers",
                                       style: TextStyle(fontSize: 16),
                                     ),
@@ -109,12 +134,12 @@ class _MyProfileState extends State<MyProfile> with RouteAware {
                                 child: Column(
                                   children: [
                                     Text(
-                                      "1.5K",
-                                      style: TextStyle(
+                                      Formatter.number(numFollowing),
+                                      style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    Text(
+                                    const Text(
                                       "Following",
                                       style: TextStyle(fontSize: 16),
                                     ),

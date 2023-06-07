@@ -19,6 +19,15 @@ class _NoAuthState extends State<NoAuth> {
 
   late Text selected;
   int selectedIndex = 0;
+
+  /*
+  Consumer<UserProvider>(builder: (context, provider, _) {
+      final SocialUser? user = provider.user;
+      if(user == null) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      Future<List<Post>> posts = AuthController.getPosts(user.uid);
+  */
   @override
   Widget build(BuildContext context) {
     return Scaffold(

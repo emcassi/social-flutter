@@ -14,8 +14,7 @@ class AuthController {
       );
       return true;
     } on FirebaseAuthException catch (e) {
-      print(e);
-      return false;
+      throw e;
     }
   }
 
@@ -37,7 +36,7 @@ class AuthController {
           "likes": 0,
         }).catchError((error) =>
         {
-          print(error)
+          throw error
         })
       });
 

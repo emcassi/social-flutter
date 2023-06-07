@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:social/pages/AddPost.dart';
 import 'package:social/pages/Browse.dart';
-import 'package:social/pages/Home.dart';
+import 'package:social/pages/home.dart';
 import 'package:social/pages/my_profile.dart';
 import 'package:social/pages/NoAuth.dart';
 import 'package:social/pages/Notifications.dart';
